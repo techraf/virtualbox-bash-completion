@@ -61,7 +61,7 @@ _vboxmanage_subcommands()
 {
     myWords=$(vboxmanage | sed '1,/Commands:/d;/Introspection/,$d' \
         | cut -d ' ' -f3 | sort -u)
-    myWords+=" extpack"
+    myWords+=" extpack debugvm"
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
 }
 
