@@ -22,7 +22,7 @@ _vboxmanage_snapname()
 {
     #_vboxmanage_wait
     myWords=$(eval vboxmanage snapshot "${COMP_WORDS[2]}" list --machinereadable \
-        | nl -n rz -w 2 -s ' ')
+        | command nl -n rz -w 2 -s ' ')
     IFS=$'\n'
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
 }
