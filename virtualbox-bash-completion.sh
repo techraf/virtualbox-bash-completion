@@ -13,8 +13,8 @@ _vboxmanage_wait()
 _vboxmanage_else_words()
 {
     myWords=$( echo $subCommand | tr '|,[]' ' ' \
-        | grep -Po '(?<= |^)\w[\w\-]+\w(?= |$)' \
-        | sed -rn 's/ off //g;p' | sort -u )
+        | command grep -Po '(?<= |^)\w[\w\-]+\w(?= |$)' \
+        | command sed -rn 's/ off //g;p' | command sort -u )
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
 }
 
@@ -30,7 +30,7 @@ _vboxmanage_snapname()
 _vboxmanage_vmname()
 {
     #_vboxmanage_wait
-    myWords=$(vboxmanage list vms | nl -n rz -w 2 -s ' ' )
+    myWords=$(vboxmanage list vms | command nl -n rz -w 2 -s ' ' )
     IFS=$'\n'
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
 }
@@ -42,10 +42,10 @@ _vboxmanage_double_quotes()
     then
         #_vboxmanage_wait snap
         myWords=$(eval vboxmanage snapshot "${COMP_WORDS[2]}" list \
-            | sed -r 's/^.*Name: //;s/ \(.+$//')
+            | command sed -r 's/^.*Name: //;s/ \(.+$//')
     else
         #_vboxmanage_wait vms
-        myWords=$(vboxmanage list vms | sed -r 's/ \{[^\}]+\}//g')
+        myWords=$(vboxmanage list vms | command sed -r 's/ \{[^\}]+\}//g')
     fi
     IFS=$'\n'
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
@@ -53,14 +53,14 @@ _vboxmanage_double_quotes()
 
 _vboxmanage_ostype()
 {
-    myWords=$(vboxmanage list ostypes | sed -rn '/^ID:/{s/^ID: *//;p}' | sort -u)
+    myWords=$(vboxmanage list ostypes | command sed -rn '/^ID:/{s/^ID: *//;p}' | command sort -u)
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
 }
 
 _vboxmanage_subcommands()
 {
-    myWords=$(vboxmanage | sed '1,/Commands:/d;/Introspection/,$d' \
-        | cut -d ' ' -f3 | sort -u)
+    myWords=$(vboxmanage | command sed '1,/Commands:/d;/Introspection/,$d' \
+        | command cut -d ' ' -f3 | command sort -u)
     myWords+=" extpack debugvm"
     COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
 }
@@ -70,7 +70,7 @@ _vboxmanage_options()
     if [ $COMP_CWORD -eq 1 ]; then
         COMPREPLY=($(compgen -W "--version --nologo --settingspw --settingspwfile" -- ${cur}))
     else
-        myWords=$( echo $subCommand | grep -o -Ee "--[[:alnum:]-]+" | sort -u)
+        myWords=$( echo $subCommand | command grep -o -Ee "--[[:alnum:]-]+" | command sort -u)
         COMPREPLY=($(compgen -W "${myWords}" -- ${cur}))
     fi
 }
@@ -90,17 +90,17 @@ _vboxmanage_main()
             return
         else
             if [ $comm2 = debugvm ]; then  
-                subCommandRaw=$( $comm1 $comm2 | tail -n +2 | tr -s ' ' \
-                    | sed -rn '1p;2,${s/VBoxManage debugvm <uuid\|vmname>//;p}' )
+                subCommandRaw=$( $comm1 $comm2 | command tail -n +2 | command tr -s ' ' \
+                    | command sed -rn '1p;2,${s/VBoxManage debugvm <uuid\|vmname>//;p}' )
             elif [ $comm2 = extpack ]; then
-                subCommandRaw=$( $comm1 $comm2 | tail -n +2 | tr -s ' ' \
-                    | sed -rn '1p;2,${s/VBoxManage extpack//;p}' )
+                subCommandRaw=$( $comm1 $comm2 | command tail -n +2 | command tr -s ' ' \
+                    | command sed -rn '1p;2,${s/VBoxManage extpack//;p}' )
             else
-                subCommandRaw=$( $comm1 $comm2 | tail -n +3 | tr -s ' ' \
-                    | sed -rn '1p;2,${s/'"$comm1 $comm2"'//;p}' )
+                subCommandRaw=$( $comm1 $comm2 | command tail -n +3 | command tr -s ' ' \
+                    | command sed -rn '1p;2,${s/'"$comm1 $comm2"'//;p}' )
             fi
-            subCommand=$( echo $subCommandRaw | cut -d ' ' -f3- \
-                | sed -r 's/[(<][^)>]*[)>]//g' )
+            subCommand=$( echo $subCommandRaw | command cut -d ' ' -f3- \
+                | command sed -r 's/[(<][^)>]*[)>]//g' )
         fi
     fi
 
